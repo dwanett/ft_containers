@@ -243,6 +243,189 @@ namespace ft
 		}
 		return (n);
 	}
+
+	template <class T>
+	class bidirectional_iterator : public iterator<std::bidirectional_iterator_tag, T>
+	{
+	public:
+		typedef typename iterator<std::bidirectional_iterator_tag, T>::value_type			value_type;
+		typedef typename iterator<std::bidirectional_iterator_tag, T>::difference_type		difference_type;
+		typedef typename iterator<std::bidirectional_iterator_tag, T>::iterator_category	iterator_category;
+		typedef T*																			pointer;
+		typedef T&																			reference;
+	private:
+		pointer	_i;
+	public:
+		bidirectional_iterator(void) : _i(0){}
+		bidirectional_iterator(pointer elem) : _i(elem){}
+		bidirectional_iterator(const bidirectional_iterator& it) : _i(it._i){}
+		virtual ~bidirectional_iterator() {}
+
+		bidirectional_iterator& operator=(const bidirectional_iterator& it)
+		{
+			this->_i = it._i;
+			return (*this);
+		}
+
+		bidirectional_iterator &operator++(void) //pre_fix
+		{
+			this->_i++;
+			return(*this);
+		}
+
+		bidirectional_iterator operator++(int) //post_fix
+		{
+			bidirectional_iterator tmp(*this);
+			this->_i++;
+			return(tmp);
+		}
+
+		bidirectional_iterator &operator--(void) //pre_fix
+		{
+			this->_i--;
+			return(*this);
+		}
+
+		bidirectional_iterator operator--(int) //post_fix
+		{
+			bidirectional_iterator tmp(*this);
+			this->_i--;
+			return(tmp);
+		}
+
+		bool operator==(const bidirectional_iterator& it) const
+		{
+			return (this->_i == it._i);
+		}
+
+		bool operator!=(const bidirectional_iterator& it) const
+		{
+			return (this->_i != it._i);
+		}
+
+		pointer base() const { return (this->_i); }
+
+		reference operator*() const { return (*_i); }
+
+		pointer operator->() const { return (this->_i); }
+
+		operator ft::bidirectional_iterator<const T>() const {
+			return ft::bidirectional_iterator<const T>(_i);
+		}
+	};
+
+	template <class value_type>
+	struct binary_tree
+	{
+	public:
+		value_type	_value;
+		binary_tree *_left_node;
+		binary_tree *_right_node;
+		binary_tree *_parent_node;
+		binary_tree() : _value(value_type()), _left_node(0), _right_node(0), _parent_node(0) {}
+		explicit binary_tree(const value_type &val, binary_tree *p = NULL, binary_tree *l = NULL, binary_tree *r = NULL) :
+				_value(val), _left_node(l), _right_node(r), _parent_node(p) {}
+		binary_tree(const binary_tree &nd) :
+				_value(nd._value), _left_node(nd._left_node), _right_node(nd._right_node), _parent_node(nd._parent_node) {};
+		binary_tree &operator=(const binary_tree &node)
+		{
+			if (*this == node)
+				return (*this);
+			_value = node._value;
+			_left_node = node._left_node;
+			_right_node = node._right_node;
+			_parent_node = node._parent_node;
+			return (*this);
+		}
+		bool operator== (const binary_tree& tree)
+		{
+			if (_value == tree._value && _left_node == tree._left_node && _right_node == tree._right_node && _parent_node == tree._parent_node)
+				return (true);
+			return (false);
+		}
+		bool operator!= (const binary_tree& tree)
+		{
+			return (!(this == tree));
+		}
+
+		~binary_tree() {};
+	};
+
+	template <class T, class allocator_type>
+	class map_iterator : public iterator<std::bidirectional_iterator_tag, T>
+	{
+	public:
+		typedef typename iterator<std::bidirectional_iterator_tag, T>::value_type			value_type;
+		typedef typename iterator<std::bidirectional_iterator_tag, T>::difference_type		difference_type;
+		typedef typename iterator<std::bidirectional_iterator_tag, T>::iterator_category	iterator_category;
+		typedef typename allocator_type::pointer											pointer;
+		typedef typename allocator_type::reference											reference;
+	private:
+		ft::binary_tree<T> node;
+		ft::binary_tree<T> null_node;
+	public:
+		map_iterator(void) : node(), null_node(){}
+		map_iterator(ft::binary_tree<T> elem) : node(elem), null_node(){}
+		map_iterator(const map_iterator& it) : node(it.node), null_node(it.null_node){}
+		virtual ~map_iterator() {}
+
+		map_iterator& operator=(const map_iterator& it)
+		{
+			this->node = it.node;
+			this->null_node = it.null_node;
+			return (*this);
+		}
+
+		map_iterator &operator++(void) //pre_fix
+		{
+			if (node._right_node != null_node)
+				node = node._right_node;
+			return(*this);
+		}
+
+		map_iterator operator++(int) //post_fix
+		{
+			map_iterator tmp(*this);
+			if (node._right_node != null_node)
+				node = node._right_node;
+			return(tmp);
+		}
+
+		map_iterator &operator--(void) //pre_fix
+		{
+			if (node._left_node != null_node)
+				node = node._left_node;
+			return(*this);
+		}
+
+		map_iterator operator--(int) //post_fix
+		{
+			map_iterator tmp(*this);
+			if (node._left_node != null_node)
+				node = node._left_node;
+			return(tmp);
+		}
+
+		bool operator==(const map_iterator& it) const
+		{
+			return (this->node == it.node && this->null_node == it.null_node);
+		}
+
+		bool operator!=(const map_iterator& it) const
+		{
+			return (!(this == it));
+		}
+
+		pointer base() const { return (this->node._value); }
+
+		reference operator*() const { return (*node._value); }
+
+		pointer operator->() const { return (this->node._value); }
+
+		operator ft::map_iterator<const T, allocator_type>() const {
+			return ft::map_iterator<const T, allocator_type>(node);
+		}
+	};
 }
 
 #endif //ITERATOR_HPP
