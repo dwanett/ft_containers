@@ -56,6 +56,37 @@ namespace ft
 		std::allocator<b_tree> 						_alloc_tree;
 		b_tree										*_root;
 		b_tree										*_null_node;
+
+		b_tree *findnode (const key_type& k)
+		{
+			b_tree	*tmp;
+
+			tmp = _root;
+			if (tmp->_value.first == k)
+				return tmp;
+			while (tmp != _null_node)
+			{
+				if (!_comp(tmp->_value.first, k))
+				{
+					if ( tmp->_left_node == _null_node)
+						return tmp;
+					tmp = tmp->_left_node;
+					continue;
+				}
+				else if (_comp(tmp->_value.first, k))
+				{
+					if ( tmp->_right_node == _null_node)
+						return tmp;
+					tmp = tmp->_right_node;
+					continue;
+				}
+				else
+				{
+					return tmp;
+				}
+			}
+			return NULL;
+		}
 	public:
 		explicit map (const key_compare& comp = key_compare(),
 					  const allocator_type& alloc = allocator_type()) : _alloc(alloc), _comp(comp), _root(), _null_node() {}
@@ -69,37 +100,52 @@ namespace ft
 
 		iterator begin()
 		{
-			b_tree node(*_root);
-			iterator it(node);
-			return (it);
+			return (iterator(_root));
 		}
-		const_iterator begin() const { return (const_iterator(*_root)); }
+		const_iterator begin() const { return (const_iterator(_root)); }
 
-		//iterator find (const key_type& k)
-		//{
-		//	iterator it = begin();
-		//	if (_node != _null_node && _node._right_node != NULL && _node._left_node != NULL)
-		//	{
-		//		iterator it =
-		//		if (_node._left_node != NULL)
-		//		{
-//
-		//		}
-		//	}
-		//}
+		iterator find (const key_type& k)
+		{
+			return (iterator(findnode(k)));
+		}
 		//const_iterator find (const key_type& k) const;
 
 		ft::pair<iterator,bool> insert (const value_type& val)
 		{
+			b_tree		*ret;
+			bool		r = true;
+
 			if (_root == _null_node)
 			{
 				b_tree tmp(val);
 				_root = _alloc_tree.allocate(1);
 				_alloc_tree.construct(_root, tmp);
-				iterator it(*_root);
-				return (ft::make_pair(it, true));
+				ret = _root;
 			}
-			//return (ft::make_pair(0, false));
+			else
+			{
+				b_tree tmp(val);
+				b_tree *input_node;
+				input_node = findnode(val.first);
+				if (val.first == input_node->_value.first)
+				{
+					ret = input_node;
+					r = false;
+				}
+				else if (!_comp(input_node->_value.first, val.first))
+				{
+					input_node->_left_node = _alloc_tree.allocate(1);
+					_alloc_tree.construct(input_node->_left_node, tmp);
+					ret = input_node->_left_node;
+				}
+				else
+				{
+					input_node->_right_node = _alloc_tree.allocate(1);
+					_alloc_tree.construct(input_node->_right_node, tmp);
+					ret = input_node->_right_node;
+				}
+			}
+			return (ft::make_pair(iterator(ret), r));
 		}
 
 		//iterator insert (iterator position, const value_type& val);

@@ -322,7 +322,7 @@ namespace ft
 		binary_tree *_left_node;
 		binary_tree *_right_node;
 		binary_tree *_parent_node;
-		binary_tree() : _value(value_type()), _left_node(0), _right_node(0), _parent_node(0) {}
+		binary_tree() : _value(value_type()), _left_node(NULL), _right_node(NULL), _parent_node(NULL) {}
 		explicit binary_tree(const value_type &val, binary_tree *p = NULL, binary_tree *l = NULL, binary_tree *r = NULL) :
 				_value(val), _left_node(l), _right_node(r), _parent_node(p) {}
 		binary_tree(const binary_tree &nd) :
@@ -361,11 +361,11 @@ namespace ft
 		typedef typename allocator_type::pointer											pointer;
 		typedef typename allocator_type::reference											reference;
 	private:
-		ft::binary_tree<T> node;
-		ft::binary_tree<T> null_node;
+		ft::binary_tree<T> *node;
+		ft::binary_tree<T> *null_node;
 	public:
-		map_iterator(void) : node(), null_node(){}
-		map_iterator(ft::binary_tree<T> elem) : node(elem), null_node(){}
+		map_iterator(void) : node(NULL), null_node(NULL){}
+		map_iterator(ft::binary_tree<T> *elem) : node(elem), null_node(NULL){}
 		map_iterator(const map_iterator& it) : node(it.node), null_node(it.null_node){}
 		virtual ~map_iterator() {}
 
@@ -378,31 +378,27 @@ namespace ft
 
 		map_iterator &operator++(void) //pre_fix
 		{
-			if (node._right_node != null_node)
-				node = node._right_node;
+			node = node->_right_node;
 			return(*this);
 		}
 
 		map_iterator operator++(int) //post_fix
 		{
 			map_iterator tmp(*this);
-			if (node._right_node != null_node)
-				node = node._right_node;
+			node = node->_right_node;
 			return(tmp);
 		}
 
 		map_iterator &operator--(void) //pre_fix
 		{
-			if (node._left_node != null_node)
-				node = node._left_node;
+			node = node->_left_node;
 			return(*this);
 		}
 
 		map_iterator operator--(int) //post_fix
 		{
 			map_iterator tmp(*this);
-			if (node._left_node != null_node)
-				node = node._left_node;
+			node = node->_left_node;
 			return(tmp);
 		}
 
@@ -416,11 +412,11 @@ namespace ft
 			return (!(this == it));
 		}
 
-		pointer base() const { return (this->node._value); }
+		pointer base() const { return (&(node->_value)); }
 
-		reference operator*() const { return (*node._value); }
+		reference operator*() const { return (node->_value); }
 
-		pointer operator->() const { return (this->node._value); }
+		pointer operator->() const { return (&(node->_value)); }
 
 		operator ft::map_iterator<const T, allocator_type>() const {
 			return ft::map_iterator<const T, allocator_type>(node);
