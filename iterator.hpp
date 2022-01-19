@@ -244,76 +244,6 @@ namespace ft
 		return (n);
 	}
 
-	template <class T>
-	class bidirectional_iterator : public iterator<std::bidirectional_iterator_tag, T>
-	{
-	public:
-		typedef typename iterator<std::bidirectional_iterator_tag, T>::value_type			value_type;
-		typedef typename iterator<std::bidirectional_iterator_tag, T>::difference_type		difference_type;
-		typedef typename iterator<std::bidirectional_iterator_tag, T>::iterator_category	iterator_category;
-		typedef T*																			pointer;
-		typedef T&																			reference;
-	private:
-		pointer	_i;
-	public:
-		bidirectional_iterator(void) : _i(0){}
-		bidirectional_iterator(pointer elem) : _i(elem){}
-		bidirectional_iterator(const bidirectional_iterator& it) : _i(it._i){}
-		virtual ~bidirectional_iterator() {}
-
-		bidirectional_iterator& operator=(const bidirectional_iterator& it)
-		{
-			this->_i = it._i;
-			return (*this);
-		}
-
-		bidirectional_iterator &operator++(void) //pre_fix
-		{
-			this->_i++;
-			return(*this);
-		}
-
-		bidirectional_iterator operator++(int) //post_fix
-		{
-			bidirectional_iterator tmp(*this);
-			this->_i++;
-			return(tmp);
-		}
-
-		bidirectional_iterator &operator--(void) //pre_fix
-		{
-			this->_i--;
-			return(*this);
-		}
-
-		bidirectional_iterator operator--(int) //post_fix
-		{
-			bidirectional_iterator tmp(*this);
-			this->_i--;
-			return(tmp);
-		}
-
-		bool operator==(const bidirectional_iterator& it) const
-		{
-			return (this->_i == it._i);
-		}
-
-		bool operator!=(const bidirectional_iterator& it) const
-		{
-			return (this->_i != it._i);
-		}
-
-		pointer base() const { return (this->_i); }
-
-		reference operator*() const { return (*_i); }
-
-		pointer operator->() const { return (this->_i); }
-
-		operator ft::bidirectional_iterator<const T>() const {
-			return ft::bidirectional_iterator<const T>(_i);
-		}
-	};
-
 	template <class value_type>
 	struct binary_tree
 	{
@@ -351,23 +281,23 @@ namespace ft
 		~binary_tree() {};
 	};
 
-	template <class T, class allocator_type>
+	template <class T, class T2>
 	class map_iterator : public iterator<std::bidirectional_iterator_tag, T>
 	{
 	public:
 		typedef typename iterator<std::bidirectional_iterator_tag, T>::value_type			value_type;
 		typedef typename iterator<std::bidirectional_iterator_tag, T>::difference_type		difference_type;
 		typedef typename iterator<std::bidirectional_iterator_tag, T>::iterator_category	iterator_category;
-		typedef typename allocator_type::pointer											pointer;
-		typedef typename allocator_type::reference											reference;
+		typedef T*																			pointer;
+		typedef T&																			reference;
 	private:
-		ft::binary_tree<T> *node;
-		ft::binary_tree<T> *last;
-		ft::binary_tree<T> *null_node;
+		T2 *node;
+		T2 *last;
+		T2 *null_node;
 	public:
 		map_iterator(void) : node(NULL), last(NULL), null_node(NULL){}
-		map_iterator(ft::binary_tree<T> *elem) : node(elem), last(elem), null_node(NULL){}
-		map_iterator(ft::binary_tree<T> *_node, ft::binary_tree<T> *_last) : node(_node), last(_last), null_node(NULL){}
+		map_iterator(T2 *elem) : node(elem), last(elem), null_node(NULL){}
+		map_iterator(T2 *_node, T2 *_last) : node(_node), last(_last), null_node(NULL){}
 		map_iterator(const map_iterator& it) : node(it.node), last(it.last), null_node(it.null_node){}
 		virtual ~map_iterator() {}
 
@@ -511,8 +441,8 @@ namespace ft
 
 		pointer operator->() const { return (&(node->_value)); }
 
-		operator ft::map_iterator<const T, allocator_type>() const {
-			return ft::map_iterator<const T, allocator_type>(node);
+		operator ft::map_iterator<const T, const T2>() const {
+			return ft::map_iterator<const T, const T2>(node, last);
 		}
 	};
 }
