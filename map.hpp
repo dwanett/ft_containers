@@ -55,6 +55,7 @@ namespace ft
 		Compare                                 	_comp;
 		std::allocator<b_tree> 						_alloc_tree;
 		b_tree										*_root;
+		b_tree										*_max_node;
 		b_tree										*_null_node;
 
 		b_tree *findnode (const key_type& k)
@@ -89,7 +90,7 @@ namespace ft
 		}
 	public:
 		explicit map (const key_compare& comp = key_compare(),
-					  const allocator_type& alloc = allocator_type()) : _alloc(alloc), _comp(comp), _root(), _null_node() {}
+					  const allocator_type& alloc = allocator_type()) : _alloc(alloc), _comp(comp), _root(), _max_node(), _null_node() {}
 
 		//template <class InputIterator>
 		//map (InputIterator first, InputIterator last,
@@ -100,15 +101,49 @@ namespace ft
 
 		iterator begin()
 		{
-			return (iterator(_root));
+			b_tree	*tmp;
+
+			tmp = _root;
+			while (tmp->_left_node != _null_node)
+				tmp = tmp->_left_node;
+			return (iterator(tmp));
 		}
-		const_iterator begin() const { return (const_iterator(_root)); }
+
+		const_iterator begin() const
+		{
+			b_tree	*tmp;
+
+			tmp = _root;
+			while (tmp->_left_node != _null_node)
+				tmp = tmp->_left_node;
+			return (const_iterator(tmp));
+		}
+
+		iterator end()
+		{
+			return (iterator(_max_node->_right_node, _max_node));
+		}
+
+		const_iterator end() const
+		{
+			return (const_iterator(_max_node->_right_node, _max_node));
+		}
 
 		iterator find (const key_type& k)
 		{
-			return (iterator(findnode(k)));
+			b_tree *res = findnode(k);
+			if (!_comp(res->_value.first, k))
+				return (iterator(res));
+			return (end());
 		}
-		//const_iterator find (const key_type& k) const;
+
+		const_iterator find (const key_type& k) const
+		{
+			b_tree *res = findnode(k);
+			if (!_comp(res->_value.first, k))
+				return (iterator(res));
+			return (end());
+		}
 
 		ft::pair<iterator,bool> insert (const value_type& val)
 		{
@@ -120,6 +155,7 @@ namespace ft
 				b_tree tmp(val);
 				_root = _alloc_tree.allocate(1);
 				_alloc_tree.construct(_root, tmp);
+				_max_node = _root;
 				ret = _root;
 			}
 			else
@@ -136,15 +172,19 @@ namespace ft
 				{
 					input_node->_left_node = _alloc_tree.allocate(1);
 					_alloc_tree.construct(input_node->_left_node, tmp);
+					input_node->_left_node->_parent_node = input_node;
 					ret = input_node->_left_node;
 				}
 				else
 				{
 					input_node->_right_node = _alloc_tree.allocate(1);
 					_alloc_tree.construct(input_node->_right_node, tmp);
+					input_node->_right_node->_parent_node = input_node;
 					ret = input_node->_right_node;
 				}
 			}
+			if (!_comp(ret->_value.first, _max_node->_value.first))
+				_max_node = ret;
 			return (ft::make_pair(iterator(ret), r));
 		}
 

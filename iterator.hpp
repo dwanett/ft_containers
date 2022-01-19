@@ -362,44 +362,137 @@ namespace ft
 		typedef typename allocator_type::reference											reference;
 	private:
 		ft::binary_tree<T> *node;
+		ft::binary_tree<T> *last;
 		ft::binary_tree<T> *null_node;
 	public:
-		map_iterator(void) : node(NULL), null_node(NULL){}
-		map_iterator(ft::binary_tree<T> *elem) : node(elem), null_node(NULL){}
-		map_iterator(const map_iterator& it) : node(it.node), null_node(it.null_node){}
+		map_iterator(void) : node(NULL), last(NULL), null_node(NULL){}
+		map_iterator(ft::binary_tree<T> *elem) : node(elem), last(elem), null_node(NULL){}
+		map_iterator(ft::binary_tree<T> *_node, ft::binary_tree<T> *_last) : node(_node), last(_last), null_node(NULL){}
+		map_iterator(const map_iterator& it) : node(it.node), last(it.last), null_node(it.null_node){}
 		virtual ~map_iterator() {}
 
 		map_iterator& operator=(const map_iterator& it)
 		{
 			this->node = it.node;
+			this->last = it.last;
 			this->null_node = it.null_node;
 			return (*this);
 		}
 
 		map_iterator &operator++(void) //pre_fix
 		{
-			node = node->_right_node;
-			return(*this);
+			if (node->_right_node != null_node)
+			{
+				node = node->_right_node;
+				while (node->_left_node != null_node)
+					node = node->_left_node;
+				last = node;
+				return (*this);
+			}
+			while (true)
+			{
+				if (node->_parent_node == null_node)
+				{
+					node = node->_parent_node;
+					return (*this);
+				}
+				if (node->_parent_node->_left_node == node)
+				{
+					node = node->_parent_node;
+					last = node;
+					return (*this);
+				}
+				node = node->_parent_node;
+			}
 		}
 
 		map_iterator operator++(int) //post_fix
 		{
 			map_iterator tmp(*this);
-			node = node->_right_node;
-			return(tmp);
+			if (node->_right_node != null_node)
+			{
+				node = node->_right_node;
+				while (node->_left_node != null_node)
+					node = node->_left_node;
+				last = node;
+				return (tmp);
+			}
+			while (true)
+			{
+				if (node->_parent_node == null_node)
+				{
+					node = node->_parent_node;
+					return (tmp);
+				}
+				if (node->_parent_node->_left_node == node)
+				{
+					node = node->_parent_node;
+					last = node;
+					return (tmp);
+				}
+				node = node->_parent_node;
+			}
 		}
 
 		map_iterator &operator--(void) //pre_fix
 		{
-			node = node->_left_node;
-			return(*this);
+			if (node == null_node)
+			{
+				node = last;
+				return (*this);
+			}
+			if (node->_left_node != null_node)
+			{
+				node = node->_left_node;
+				while (node->_right_node != null_node)
+					node = node->_right_node;
+				return (*this);
+			}
+			while (true)
+			{
+				if (node->_parent_node == null_node)
+				{
+					node = node->_parent_node;
+					return (*this);
+				}
+				if (node->_parent_node->_right_node == node)
+				{
+					node = node->_parent_node;
+					return (*this);
+				}
+				node = node->_parent_node;
+			}
 		}
 
 		map_iterator operator--(int) //post_fix
 		{
 			map_iterator tmp(*this);
-			node = node->_left_node;
-			return(tmp);
+			if (node == null_node)
+			{
+				node = last;
+				return (tmp);
+			}
+			if (node->_left_node != null_node)
+			{
+				node = node->_left_node;
+				while (node->_right_node != null_node)
+					node = node->_right_node;
+				return (tmp);
+			}
+			while (true)
+			{
+				if (node->_parent_node == null_node)
+				{
+					node = node->_parent_node;
+					return (tmp);
+				}
+				if (node->_parent_node->_right_node == node)
+				{
+					node = node->_parent_node;
+					return (tmp);
+				}
+				node = node->_parent_node;
+			}
 		}
 
 		bool operator==(const map_iterator& it) const
@@ -409,7 +502,7 @@ namespace ft
 
 		bool operator!=(const map_iterator& it) const
 		{
-			return (!(this == it));
+			return (!(*this == it));
 		}
 
 		pointer base() const { return (&(node->_value)); }
