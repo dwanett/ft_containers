@@ -56,19 +56,18 @@ namespace ft
 		size_type									_size;
 		std::allocator<b_tree> 						_alloc_tree;
 		b_tree										*_root;
-		b_tree										*_max_node;
 		b_tree										*_null_node;
 
-		b_tree *findnode (const key_type& k) const
+		b_tree *findnode (const key_type& k, b_tree *start) const
 		{
 			b_tree	*tmp;
 
-			tmp = _root;
+			tmp = start;
 			if (tmp->_value.first == k)
 				return tmp;
 			while (tmp != _null_node)
 			{
-				if (!_comp(tmp->_value.first, k))
+				if (!_comp(tmp->_value.first, k) && tmp->_value.first != k)
 				{
 					if ( tmp->_left_node == _null_node)
 						return tmp;
@@ -89,9 +88,22 @@ namespace ft
 			}
 			return NULL;
 		}
+
+		b_tree	*find_max_node() const
+		{
+			b_tree	*tmp;
+
+			tmp = _root;
+			if (tmp != _null_node)
+			{
+				while (tmp->_right_node != _null_node)
+					tmp = tmp->_right_node;
+			}
+			return (tmp);
+		}
 	public:
 		explicit map (const key_compare& comp = key_compare(),
-					  const allocator_type& alloc = allocator_type()) : _alloc(alloc), _comp(comp), _size(0), _root(), _max_node(), _null_node() {}
+					  const allocator_type& alloc = allocator_type()) : _alloc(alloc), _comp(comp), _size(0), _root(), _null_node() {}
 
 		//template <class InputIterator>
 		//map (InputIterator first, InputIterator last,
@@ -102,15 +114,21 @@ namespace ft
 
 		//map& operator= (const map& x) {}
 
-		//~map() {}
+		~map()
+		{
+			clear();
+		}
 
 		iterator							begin()
 		{
 			b_tree	*tmp;
 
 			tmp = _root;
-			while (tmp->_left_node != _null_node)
-				tmp = tmp->_left_node;
+			if (_root != _null_node)
+			{
+				while (tmp->_left_node != _null_node)
+					tmp = tmp->_left_node;
+			}
 			return (iterator(tmp));
 		}
 
@@ -119,19 +137,28 @@ namespace ft
 			b_tree	*tmp;
 
 			tmp = _root;
-			while (tmp->_left_node != _null_node)
-				tmp = tmp->_left_node;
+			if (_root != _null_node)
+			{
+				while (tmp->_left_node != _null_node)
+					tmp = tmp->_left_node;
+			}
 			return (const_iterator(tmp));
 		}
 
 		iterator							end()
 		{
-			return (iterator(_max_node->_right_node, _max_node));
+			b_tree	*tmp = find_max_node();
+			if (tmp != _null_node)
+				return (iterator(tmp->_right_node, tmp));
+			return (iterator(tmp));
 		}
 
 		const_iterator						end() const
 		{
-			return (const_iterator(_max_node->_right_node, _max_node));
+			b_tree	*tmp = find_max_node();
+			if (tmp != _null_node)
+				return (const_iterator(tmp->_right_node, tmp));
+			return (iterator(tmp));
 		}
 
 		reverse_iterator					rbegin() { return(reverse_iterator(end())); }
@@ -144,7 +171,7 @@ namespace ft
 
 		iterator							find(const key_type& k)
 		{
-			b_tree *res = findnode(k);
+			b_tree *res = findnode(k, _root);
 			if (!_comp(res->_value.first, k))
 				return (iterator(res));
 			return (end());
@@ -152,7 +179,7 @@ namespace ft
 
 		const_iterator						find(const key_type& k) const
 		{
-			b_tree *res = findnode(k);
+			b_tree *res = findnode(k, _root);
 			if (!_comp(res->_value.first, k))
 				return (const_iterator(res));
 			return (end());
@@ -213,14 +240,32 @@ namespace ft
 			return (it);
 		}
 
-		pair<const_iterator,const_iterator>	equal_range (const key_type& k) const
+		pair<const_iterator, const_iterator>	equal_range (const key_type& k) const
 		{
-
+			const_iterator it = begin();
+			while (it != end())
+			{
+				if (!_comp(it->first, k))
+					break;
+				it++;
+			}
+			if (!_comp(it->first, k) && !_comp(k, it->first))
+				return (make_pair(it, ++it));
+			return (make_pair(it, it));
 		}
 
-		pair<iterator,iterator>				equal_range (const key_type& k)
+		pair<iterator, iterator>				equal_range (const key_type& k)
 		{
-
+			iterator it = begin();
+			while (it != end())
+			{
+				if (!_comp(it->first, k))
+					break;
+				it++;
+			}
+			if (!_comp(it->first, k) && !_comp(k, it->first))
+				return (make_pair(it, ++it));
+			return (make_pair(it, it));
 		}
 
 		bool								empty() const { return (_size == 0); }
@@ -245,7 +290,6 @@ namespace ft
 				_root = _alloc_tree.allocate(1);
 				_alloc.construct(&tmp._value, val);
 				_alloc_tree.construct(_root, tmp);
-				_max_node = _root;
 				ret = _root;
 				_size++;
 
@@ -253,7 +297,7 @@ namespace ft
 			else
 			{
 				b_tree *input_node;
-				input_node = findnode(val.first);
+				input_node = findnode(val.first, _root);
 				_alloc.construct(&tmp._value, val);
 				if (val.first == input_node->_value.first)
 				{
@@ -277,19 +321,162 @@ namespace ft
 					_size++;
 				}
 			}
-			if (!_comp(ret->_value.first, _max_node->_value.first))
-				_max_node = ret;
 			return (ft::make_pair(iterator(ret), r));
 		}
 
-		//iterator							insert(iterator position, const value_type& val);
+		iterator							insert(iterator position, const value_type& val)
+		{
+			iterator	it = position;
+			b_tree		*input_node;
+			b_tree		tmp;
 
-		//template <class InputIterator>
-		//void								insert (InputIterator first, InputIterator last);
+			_alloc.construct(&tmp._value, val);
+			if (position.base() != NULL && position.base() != _null_node
+				&& _comp(position->first, val.first) && _comp(val.first, (++it)->first))
+				input_node = findnode(val.first, position.base());
+			else
+				input_node = findnode(val.first, _root);
+			if (val.first == input_node->_value.first)
+				return (input_node);
+			if (!_comp(input_node->_value.first, val.first))
+			{
+				input_node->_left_node = _alloc_tree.allocate(1);
+				_alloc_tree.construct(input_node->_left_node, tmp);
+				input_node->_left_node->_parent_node = input_node;
+				_size++;
+				return (input_node->_left_node);
+			}
+			else
+			{
+				input_node->_right_node = _alloc_tree.allocate(1);
+				_alloc_tree.construct(input_node->_right_node, tmp);
+				input_node->_right_node->_parent_node = input_node;
+				_size++;
+				return (input_node->_right_node);
+			}
+		}
+
+		template <class InputIterator>
+		void								insert (InputIterator first, InputIterator last)
+		{
+			while (first != last)
+			{
+				insert(*first);
+				first++;
+			}
+		}
+
+		void								erase (iterator position)
+		{
+			b_tree *node = position.base();
+
+			if (_root != node)
+			{
+				if (node->_right_node == _null_node && node->_left_node == _null_node)
+				{
+					if (node->_parent_node->_left_node == node)
+						node->_parent_node->_left_node = _null_node;
+					else
+						node->_parent_node->_right_node = _null_node;
+				}
+				else if (node->_right_node == _null_node && node->_left_node != _null_node)
+				{
+					node->_left_node->_parent_node = node->_parent_node;
+					if (node->_parent_node->_left_node == node)
+						node->_parent_node->_left_node = node->_left_node;
+					else
+						node->_parent_node->_right_node = node->_left_node;
+				}
+				else if (node->_left_node == _null_node && node->_right_node != _null_node)
+				{
+					node->_right_node->_parent_node = node->_parent_node;
+					if (node->_parent_node->_left_node == node)
+						node->_parent_node->_left_node = node->_right_node;
+					else
+						node->_parent_node->_right_node = node->_right_node;
+				}
+				else if (node->_right_node != _null_node && node->_left_node != _null_node)
+				{
+					b_tree *tmp;
+
+					tmp = node->_right_node;
+					node->_right_node->_parent_node = node->_parent_node;
+					if (node->_parent_node->_left_node == node)
+						node->_parent_node->_left_node = node->_right_node;
+					else
+						node->_parent_node->_right_node = node->_right_node;
+					while (tmp->_left_node != _null_node)
+						tmp = tmp->_left_node;
+					tmp->_left_node = node->_left_node;
+					node->_left_node->_parent_node = tmp;
+				}
+			}
+			else
+			{
+				if (node->_right_node != _null_node)
+				{
+					if (node->_left_node != _null_node)
+					{
+						b_tree *tmp;
+
+						tmp = node->_right_node;
+						while (tmp->_left_node != _null_node)
+							tmp = tmp->_left_node;
+						node->_left_node->_parent_node = tmp;
+						tmp->_left_node = node->_left_node;
+
+					}
+					_root = node->_right_node;
+					_root->_parent_node = _null_node;
+				}
+				else if (node->_left_node != _null_node)
+				{
+					_root = node->_left_node;
+					_root->_parent_node = _null_node;
+				}
+			}
+			node->_left_node = _null_node;
+			node->_right_node = _null_node;
+			node->_parent_node = _null_node;
+			_alloc_tree.destroy(node);
+			_alloc_tree.deallocate(node, 1);
+			_size--;
+			if (_size == 0)
+				_root = _null_node;
+		}
+
+		size_type							erase (const key_type& k)
+		{
+			b_tree *tmp = findnode(k, _root);
+			if (tmp->_value.first == k)
+			{
+				erase(tmp);
+				return (1);
+			}
+			return (0);
+		}
+
+		void								erase (iterator first, iterator last)
+		{
+			iterator tmp;
+
+			while (first != last)
+			{
+				tmp = first;
+				first++;
+				erase(tmp);
+			}
+		}
+
+		//void								swap (map& x);
+
+		void								clear()
+		{
+			erase(begin(), end());
+		}
 
 		allocator_type						get_allocator() const {return (_alloc); }
 	};
 }
-
 
 #endif // MAP_HPP

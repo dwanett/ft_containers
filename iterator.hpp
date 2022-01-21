@@ -311,6 +311,8 @@ namespace ft
 
 		map_iterator &operator++(void) //pre_fix
 		{
+			if (node == null_node)
+				return (*this);
 			if (node->_right_node != null_node)
 			{
 				node = node->_right_node;
@@ -339,6 +341,8 @@ namespace ft
 		map_iterator operator++(int) //post_fix
 		{
 			map_iterator tmp(*this);
+			if (node == null_node)
+				return (tmp);
 			if (node->_right_node != null_node)
 			{
 				node = node->_right_node;
@@ -435,7 +439,7 @@ namespace ft
 			return (!(*this == it));
 		}
 
-		pointer base() const { return (&(node->_value)); }
+		T2 *base() const { return (node); }
 
 		reference operator*() const { return (node->_value); }
 
