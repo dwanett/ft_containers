@@ -63,7 +63,6 @@ int main ()
 	std::cout << std::endl;
 	std::cout << std::endl;
 
-	origit = orig_map.begin();
 	orig_map.clear();
 	std::cout << "orig_map: " << "size = " << orig_map.size() << std::endl;
 
@@ -128,6 +127,43 @@ int main ()
 	std::cout << std::endl;
 
 	myit = my_map.begin();
+	for (; myit != my_map.end(); ++myit)
+		std::cout << "my_map: " << myit->first << " => " << myit->second << '\n';
+	myit = my_map_2.begin();
+	std::cout << std::endl;
+	for (; myit != my_map_2.end(); ++myit)
+		std::cout << "my_map_2: " << myit->first << " => " << myit->second << '\n';
+	my_map.swap(my_map_2);
+	std::cout << std::endl;
+	std::cout << std::endl;
+	myit = my_map.begin();
+	for (; myit != my_map.end(); ++myit)
+		std::cout << "my_map: " << myit->first << " => " << myit->second << '\n';
+	myit = my_map_2.begin();
+	std::cout << std::endl;
+	for (; myit != my_map_2.end(); ++myit)
+		std::cout << "my_map_2: " << myit->first << " => " << myit->second << '\n';
+
+	ft::map<int,int> my_map_3(my_map.begin(), my_map.end());
+	myit = my_map_3.begin();
+	std::cout << std::endl;
+	for (; myit != my_map_3.end(); ++myit)
+		std::cout << "my_map_3: " << myit->first << " => " << myit->second << '\n';
+	std::cout << "my_map_3: " << "size = " << my_map_3.size() << std::endl;
+	ft::map<int,int> my_map_4(my_map_2);
+	myit = my_map_4.begin();
+	std::cout << std::endl;
+	for (; myit != my_map_4.end(); ++myit)
+		std::cout << "my_map_4: " << myit->first << " => " << myit->second << '\n';
+	std::cout << "my_map_4: " << "size = " << my_map_4.size() << std::endl;
+
+	my_map_4 = my_map_3;
+
+	myit = my_map_4.begin();
+	std::cout << std::endl;
+	for (; myit != my_map_4.end(); ++myit)
+		std::cout << "my_map_4: " << myit->first << " => " << myit->second << '\n';
+	std::cout << "my_map_4: " << "size = " << my_map_4.size() << std::endl;
 	my_map.clear();
 	std::cout << "my_map: " << "size = " << my_map.size() << std::endl;
 	return 0;

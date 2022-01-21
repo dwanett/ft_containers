@@ -105,14 +105,33 @@ namespace ft
 		explicit map (const key_compare& comp = key_compare(),
 					  const allocator_type& alloc = allocator_type()) : _alloc(alloc), _comp(comp), _size(0), _root(), _null_node() {}
 
-		//template <class InputIterator>
-		//map (InputIterator first, InputIterator last,
-		//	 const key_compare& comp = key_compare(),
-		//	 const allocator_type& alloc = allocator_type());
+		template <class InputIterator>
+		map (InputIterator first, InputIterator last,
+			 const key_compare& comp = key_compare(),
+			 const allocator_type& alloc = allocator_type()) : _alloc(alloc), _comp(comp), _size(0), _root(), _null_node()
+		{
+			insert(first, last);
+		}
 
-		//map (const map& x);
+		map (const map& x) : _size(0), _root(), _null_node()
+		{
+			_alloc = x._alloc;
+			_comp = x._comp;
+			_alloc_tree = x._alloc_tree;
+			insert(x.begin(), x.end());
+		}
 
-		//map& operator= (const map& x) {}
+		map& operator=(const map& x)
+		{
+			//if (*this == x)
+			//	return (*this);
+			clear();
+			_alloc = x._alloc;
+			_comp = x._comp;
+			_alloc_tree = x._alloc_tree;
+			insert(x.begin(), x.end());
+			return (*this);
+		}
 
 		~map()
 		{
@@ -192,7 +211,7 @@ namespace ft
 			return (0);
 		}
 
-		iterator							lower_bound (const key_type& k)
+		iterator							lower_bound(const key_type& k)
 		{
 			iterator it = begin();
 			while (it != end())
@@ -204,7 +223,7 @@ namespace ft
 			return (it);
 		}
 
-		const_iterator						lower_bound (const key_type& k) const
+		const_iterator						lower_bound(const key_type& k) const
 		{
 			const_iterator it = begin();
 			while (it != end())
@@ -216,7 +235,7 @@ namespace ft
 			return (it);
 		}
 
-		iterator							upper_bound (const key_type& k)
+		iterator							upper_bound(const key_type& k)
 		{
 			iterator it = begin();
 			while (it != end())
@@ -228,7 +247,7 @@ namespace ft
 			return (it);
 		}
 
-		const_iterator						upper_bound (const key_type& k) const
+		const_iterator						upper_bound(const key_type& k) const
 		{
 			const_iterator it = begin();
 			while (it != end())
@@ -240,7 +259,7 @@ namespace ft
 			return (it);
 		}
 
-		pair<const_iterator, const_iterator>	equal_range (const key_type& k) const
+		pair<const_iterator, const_iterator>	equal_range(const key_type& k) const
 		{
 			const_iterator it = begin();
 			while (it != end())
@@ -254,7 +273,7 @@ namespace ft
 			return (make_pair(it, it));
 		}
 
-		pair<iterator, iterator>				equal_range (const key_type& k)
+		pair<iterator, iterator>				equal_range(const key_type& k)
 		{
 			iterator it = begin();
 			while (it != end())
@@ -357,7 +376,7 @@ namespace ft
 		}
 
 		template <class InputIterator>
-		void								insert (InputIterator first, InputIterator last)
+		void								insert(InputIterator first, InputIterator last)
 		{
 			while (first != last)
 			{
@@ -366,7 +385,7 @@ namespace ft
 			}
 		}
 
-		void								erase (iterator position)
+		void								erase(iterator position)
 		{
 			b_tree *node = position.base();
 
@@ -445,7 +464,7 @@ namespace ft
 				_root = _null_node;
 		}
 
-		size_type							erase (const key_type& k)
+		size_type							erase(const key_type& k)
 		{
 			b_tree *tmp = findnode(k, _root);
 			if (tmp->_value.first == k)
@@ -456,7 +475,7 @@ namespace ft
 			return (0);
 		}
 
-		void								erase (iterator first, iterator last)
+		void								erase(iterator first, iterator last)
 		{
 			iterator tmp;
 
@@ -468,15 +487,66 @@ namespace ft
 			}
 		}
 
-		//void								swap (map& x);
-
-		void								clear()
+		void								swap(map& x)
 		{
-			erase(begin(), end());
+			allocator_type          tmp_alloc;
+			key_compare				tmp_comp;
+			size_type				tmp_size;
+			std::allocator<b_tree> 	tmp_alloc_tree;
+			b_tree					*tmp_root;
+			b_tree					*tmp_null_node;
+
+			tmp_alloc = x._alloc;
+			tmp_comp = x._comp;
+			tmp_size = x._size;
+			tmp_alloc_tree = x._alloc_tree;
+			tmp_root = x._root;
+			tmp_null_node = x._null_node;
+			x._alloc = this->_alloc;
+			x._comp = this->_comp;
+			x._size = this->_size;
+			x._alloc_tree = this->_alloc_tree;
+			x._root = this->_root;
+			x._null_node = this->_null_node;
+			this->_alloc = tmp_alloc;
+			this->_comp = tmp_comp;
+			this->_size = tmp_size;
+			this->_alloc_tree = tmp_alloc_tree;
+			this->_root = tmp_root;
+			this->_null_node = tmp_null_node;
 		}
+
+		void								clear() { erase(begin(), end()); }
 
 		allocator_type						get_allocator() const {return (_alloc); }
 	};
+
+	template <class Key, class T, class Compare, class Alloc>
+		void swap (map<Key,T,Compare,Alloc>& x, map<Key,T,Compare,Alloc>& y) { x.swap(y); }
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator== ( const map<Key,T,Compare,Alloc>& lhs,
+					  const map<Key,T,Compare,Alloc>& rhs );
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator!= ( const map<Key,T,Compare,Alloc>& lhs,
+					  const map<Key,T,Compare,Alloc>& rhs );
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator<  ( const map<Key,T,Compare,Alloc>& lhs,
+					  const map<Key,T,Compare,Alloc>& rhs );
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator<= ( const map<Key,T,Compare,Alloc>& lhs,
+					  const map<Key,T,Compare,Alloc>& rhs );
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator>  ( const map<Key,T,Compare,Alloc>& lhs,
+					  const map<Key,T,Compare,Alloc>& rhs );
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator>= ( const map<Key,T,Compare,Alloc>& lhs,
+					  const map<Key,T,Compare,Alloc>& rhs );
 }
 
 #endif // MAP_HPP
