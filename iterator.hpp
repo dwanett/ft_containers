@@ -185,8 +185,6 @@ namespace ft
 		}
 		reverse_iterator operator+(difference_type n) const { return (reverse_iterator(this->rev_i - n)); }
 
-		//friend reverse_iterator operator+(difference_type n, const reverse_iterator& it) { return (reverse_iterator(it.base() - n)); }
-
 		reverse_iterator &operator++(void) //pre_fix
 		{
 			this->rev_i--;
@@ -199,8 +197,6 @@ namespace ft
 			return(tmp);
 		}
 		reverse_iterator operator-(difference_type n) const { return (reverse_iterator(this->rev_i + n)); }
-
-		//friend reverse_iterator operator-(difference_type n, const reverse_iterator& it) { return (reverse_iterator(it.base() + n)); }
 
 		reverse_iterator &operator+=(difference_type n)
 		{
