@@ -53,7 +53,8 @@ namespace ft
 
 		template <class InputIterator>
 		vector (InputIterator first, InputIterator last,
-				const allocator_type& alloc = allocator_type())
+				const allocator_type& alloc = allocator_type(),
+				typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = NULL)
 		{
 			difference_type n = ft::distance(first, last);
 			_alloc = alloc;
@@ -259,7 +260,7 @@ namespace ft
 				iterator it;
 				for (it = begin(); it != position; it++, new_end++)
 					_alloc.construct(new_end, *it);
-				for (int i = 0; i != n; i++, new_end++)
+				for (size_type i = 0; i != n; i++, new_end++)
 					_alloc.construct(new_end, val);
 				for (; it != _end; it++, new_end++)
 					_alloc.construct(new_end, *it);
@@ -275,7 +276,7 @@ namespace ft
 			void insert (iterator position, InputIterator first, InputIterator last,
 						 typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = NULL)
 		{
-			difference_type range = distance(first, last);
+			difference_type range = ft::distance(first, last);
 			if (range == 0)
 				return;
 			if (size() + range < capacity())
@@ -298,10 +299,7 @@ namespace ft
 			else
 			{
 				size_type new_cap;
-				if (size() == 0)
-					new_cap = 1;
-				else
-					new_cap = size() + range;
+				new_cap = size() + range;
 				pointer new_start = _alloc.allocate(new_cap);
 				pointer new_end = new_start;
 				iterator it;
@@ -372,9 +370,9 @@ namespace ft
 		void assign (InputIterator first, InputIterator last,
 					 typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = NULL)
 		{
-			difference_type range = distance(first, last);
+			difference_type range = ft::distance(first, last);
 			clear();
-			if (range <= capacity())
+			if ((size_type)range <= capacity())
 			{
 				_end = _start;
 				for (; first != last; first++, _end++)

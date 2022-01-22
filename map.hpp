@@ -63,7 +63,7 @@ namespace ft
 			b_tree	*tmp;
 
 			tmp = start;
-			if (tmp->_value.first == k)
+			if (tmp != _null_node && tmp->_value.first == k)
 				return tmp;
 			while (tmp != _null_node)
 			{
@@ -86,7 +86,7 @@ namespace ft
 					return tmp;
 				}
 			}
-			return NULL;
+			return _null_node;
 		}
 
 		b_tree	*find_max_node() const
@@ -191,7 +191,7 @@ namespace ft
 		iterator							find(const key_type& k)
 		{
 			b_tree *res = findnode(k, _root);
-			if (!_comp(res->_value.first, k))
+			if (res->_value.first == k)
 				return (iterator(res));
 			return (end());
 		}
@@ -199,7 +199,7 @@ namespace ft
 		const_iterator						find(const key_type& k) const
 		{
 			b_tree *res = findnode(k, _root);
-			if (!_comp(res->_value.first, k))
+			if (res->_value.first == k)
 				return (const_iterator(res));
 			return (end());
 		}
@@ -268,7 +268,7 @@ namespace ft
 					break;
 				it++;
 			}
-			if (!_comp(it->first, k) && !_comp(k, it->first))
+			if (it != end() && !_comp(it->first, k) && !_comp(k, it->first))
 				return (make_pair(it, ++it));
 			return (make_pair(it, it));
 		}
@@ -350,6 +350,11 @@ namespace ft
 			b_tree		tmp;
 
 			_alloc.construct(&tmp._value, val);
+			if (_root == _null_node)
+			{
+				insert(val);
+				return (_root);
+			}
 			if (position.base() != NULL && position.base() != _null_node
 				&& _comp(position->first, val.first) && _comp(val.first, (++it)->first))
 				input_node = findnode(val.first, position.base());
@@ -517,6 +522,11 @@ namespace ft
 		}
 
 		void								clear() { erase(begin(), end()); }
+
+		mapped_type& operator[] (const key_type& k)
+		{
+			return ((*((this->insert(ft::make_pair(k,mapped_type()))).first)).second);
+		}
 
 		allocator_type						get_allocator() const {return (_alloc); }
 	};

@@ -96,16 +96,6 @@ namespace ft
 			return(tmp);
 		}
 
-		bool operator==(const random_access_iterator& it) const
-		{
-			return (this->_i == it._i);
-		}
-
-		bool operator!=(const random_access_iterator& it) const
-		{
-			return (this->_i != it._i);
-		}
-
 		pointer base() const { return (this->_i); }
 
 		reference operator*() const { return (*_i); }
@@ -134,19 +124,39 @@ namespace ft
 
 		reference operator[](difference_type n) const { return (*(this->_i + n)); }
 
-		bool operator<(const random_access_iterator& it) const { return (this->_i < it._i); }
+		friend bool operator==(const random_access_iterator& lhs, const random_access_iterator& rhs) { return (lhs._i == rhs._i); }
 
-		bool operator>(const random_access_iterator& it) const { return (this->_i > it._i); }
+		friend bool operator!=(const random_access_iterator& lhs, const random_access_iterator& rhs) { return (lhs._i != rhs._i); }
 
-		bool operator>=(const random_access_iterator& it) const { return (this->_i >= it._i); }
+		friend bool operator<(const random_access_iterator& lhs, const random_access_iterator& rhs) { return (lhs._i < rhs._i); }
 
-		bool operator<=(const random_access_iterator& it) const { return (this->_i <= it._i); }
+		friend bool operator>(const random_access_iterator& lhs, const random_access_iterator& rhs) { return (lhs._i > rhs._i); }
+
+		friend bool operator>=(const random_access_iterator& lhs, const random_access_iterator& rhs) { return (lhs._i >= rhs._i); }
+
+		friend bool operator<=(const random_access_iterator& lhs, const random_access_iterator& rhs) { return (lhs._i <= rhs._i); }
 
 		operator ft::random_access_iterator<const T>() const {
 			return ft::random_access_iterator<const T>(_i);
 		}
 
 	};
+
+	template<typename ItL, typename ItR>
+	typename random_access_iterator<ItL>::difference_type
+	operator-(const random_access_iterator<ItL> &lhs,
+			  const random_access_iterator<ItR> &rhs) { return lhs.base() - rhs.base(); }
+
+	template<typename It>
+	typename random_access_iterator<It>::difference_type
+	operator-(const random_access_iterator<It> &lhs,
+			  const random_access_iterator<It> &rhs) { return lhs.base() - rhs.base(); }
+
+	template<typename It>
+	random_access_iterator<It>
+	operator+(typename random_access_iterator<It>::difference_type
+			  n, const random_access_iterator<It> &i) {
+		return random_access_iterator<It>(i.base() + n); }
 
 	template <class Iter>
 	class reverse_iterator
@@ -173,8 +183,10 @@ namespace ft
 			iterator_type tmp = rev_i;
 			return (*(--tmp));
 		}
-		reverse_iterator operator+(difference_type n) const { return (this->rev_i - n); }
-		friend reverse_iterator operator+(difference_type n, const reverse_iterator& it) { return (it.base() - n); }
+		reverse_iterator operator+(difference_type n) const { return (reverse_iterator(this->rev_i - n)); }
+
+		//friend reverse_iterator operator+(difference_type n, const reverse_iterator& it) { return (reverse_iterator(it.base() - n)); }
+
 		reverse_iterator &operator++(void) //pre_fix
 		{
 			this->rev_i--;
@@ -186,8 +198,10 @@ namespace ft
 			this->rev_i--;
 			return(tmp);
 		}
-		reverse_iterator operator-(difference_type n) const { return (this->rev_i + n); }
-		friend reverse_iterator operator-(difference_type n, const reverse_iterator& it) { return (it.base() + n); }
+		reverse_iterator operator-(difference_type n) const { return (reverse_iterator(this->rev_i + n)); }
+
+		//friend reverse_iterator operator-(difference_type n, const reverse_iterator& it) { return (reverse_iterator(it.base() + n)); }
+
 		reverse_iterator &operator+=(difference_type n)
 		{
 			this->rev_i -= n;
@@ -209,7 +223,9 @@ namespace ft
 			this->rev_i += n;
 			return (*this);
 		}
+
 		pointer operator->() const { return &(operator*()); }
+
 		reference operator[](difference_type n) const { return (*(*this + n)); }
 	};
 
@@ -231,6 +247,41 @@ namespace ft
 	template <class Iter>
 	bool operator>=(const reverse_iterator<Iter>& lhs,
 					 const reverse_iterator<Iter>& rhs) {return (lhs.base() <= rhs.base()); }
+
+	template<typename Iter>
+	typename reverse_iterator<Iter>::difference_type
+	operator-(const reverse_iterator<Iter> &x,
+			  const reverse_iterator<Iter> &y) { return y.base() - x.base(); }
+
+	template <class Iter, class Iter_2>
+	typename reverse_iterator<Iter>::difference_type
+	operator-(const reverse_iterator<Iter> &x,
+			  const reverse_iterator<Iter_2> &y) { return y.base() - x.base(); }
+
+	template<typename Iter>
+	reverse_iterator<Iter>
+	operator+(typename reverse_iterator<Iter>::difference_type n,
+			  const reverse_iterator<Iter> &x) { return reverse_iterator<Iter>(x.base() - n); }
+
+	template <class Iter, class Iter_2>
+	bool operator==(const reverse_iterator<Iter>& lhs,
+					const reverse_iterator<Iter_2>& rhs) {return (lhs.base() == rhs.base()); }
+	template <class Iter, class Iter_2>
+	bool operator!=(const reverse_iterator<Iter>& lhs,
+					const reverse_iterator<Iter_2>& rhs) {return (lhs.base() != rhs.base()); }
+	template <class Iter, class Iter_2>
+	bool operator<(const reverse_iterator<Iter>& lhs,
+				   const reverse_iterator<Iter_2>& rhs) {return (lhs.base() > rhs.base()); }
+	template <class Iter, class Iter_2>
+	bool operator<=(const reverse_iterator<Iter>& lhs,
+					const reverse_iterator<Iter_2>& rhs) {return (lhs.base() >= rhs.base()); }
+	template <class Iter, class Iter_2>
+	bool operator>(const reverse_iterator<Iter>& lhs,
+				   const reverse_iterator<Iter_2>& rhs) {return (lhs.base() < rhs.base()); }
+	template <class Iter, class Iter_2>
+	bool operator>=(const reverse_iterator<Iter>& lhs,
+					const reverse_iterator<Iter_2>& rhs) {return (lhs.base() <= rhs.base()); }
+
 	template <class Iterator>
 	typename iterator_traits<Iterator>::difference_type distance (Iterator first, Iterator last)
 	{
@@ -252,11 +303,14 @@ namespace ft
 		binary_tree *_left_node;
 		binary_tree *_right_node;
 		binary_tree *_parent_node;
-		binary_tree() : _value(value_type()), _left_node(NULL), _right_node(NULL), _parent_node(NULL) {}
+		bool red;
+
+		binary_tree() : _value(value_type()), _left_node(NULL), _right_node(NULL), _parent_node(NULL), red(true) {}
 		explicit binary_tree(const value_type &val, binary_tree *p = NULL, binary_tree *l = NULL, binary_tree *r = NULL) :
-				_value(val), _left_node(l), _right_node(r), _parent_node(p) {}
+				_value(val), _left_node(l), _right_node(r), _parent_node(p), red(true) {}
 		binary_tree(const binary_tree &nd) :
-				_value(nd._value), _left_node(nd._left_node), _right_node(nd._right_node), _parent_node(nd._parent_node) {};
+				_value(nd._value), _left_node(nd._left_node), _right_node(nd._right_node), _parent_node(nd._parent_node), red(nd.red) {};
+
 		binary_tree &operator=(const binary_tree &node)
 		{
 			if (*this == node)
@@ -273,6 +327,7 @@ namespace ft
 				return (true);
 			return (false);
 		}
+
 		bool operator!= (const binary_tree& tree)
 		{
 			return (!(this == tree));
