@@ -63,6 +63,21 @@ int main ()
 	std::cout << std::endl;
 	std::cout << std::endl;
 
+	std::cout << "orig_map < orig_map: " << (orig_map < orig_map) << '\n';
+	std::cout << "orig_map < orig_map_2: " << (orig_map < orig_map_2) << '\n';
+	std::cout << std::endl;
+	std::cout << "orig_map <= orig_map: " << (orig_map <= orig_map) << '\n';
+	std::cout << "orig_map <= orig_map_2: " << (orig_map <= orig_map_2) << '\n';
+	std::cout << std::endl;
+	std::cout << "orig_map > orig_map: " << (orig_map > orig_map) << '\n';
+	std::cout << "orig_map > orig_map_2: " << (orig_map > orig_map_2) << '\n';
+	std::cout << std::endl;
+	std::cout << "orig_map >= orig_map: " << (orig_map >= orig_map) << '\n';
+	std::cout << "orig_map >= orig_map_2: " << (orig_map >= orig_map_2) << '\n';
+	std::cout << std::endl;
+	std::cout << "orig_map == orig_map: " << (orig_map == orig_map) << '\n';
+	std::cout << "orig_map == orig_map_2: " << (orig_map == orig_map_2) << '\n';
+
 	orig_map.clear();
 	std::cout << "orig_map: " << "size = " << orig_map.size() << std::endl;
 
@@ -123,6 +138,21 @@ int main ()
 	for (; myit != my_map.end(); ++myit)
 		std::cout << "my_map: " << myit->first << " => " << myit->second << '\n';
 
+	std::cout << std::endl;
+	std::cout << "my_map < my_map: " << (my_map < my_map) << '\n';
+	std::cout << "my_map < my_map_2: " << (my_map < my_map_2) << '\n';
+	std::cout << std::endl;
+	std::cout << "my_map <= my_map: " << (my_map <= my_map) << '\n';
+	std::cout << "my_map <= my_map_2: " << (my_map <= my_map_2) << '\n';
+	std::cout << std::endl;
+	std::cout << "my_map > my_map: " << (my_map > my_map) << '\n';
+	std::cout << "my_map > my_map_2: " << (my_map > my_map_2) << '\n';
+	std::cout << std::endl;
+	std::cout << "my_map >= my_map: " << (my_map >= my_map) << '\n';
+	std::cout << "my_map >= my_map_2: " << (my_map >= my_map_2) << '\n';
+	std::cout << std::endl;
+	std::cout << "my_map == my_map: " << (my_map == my_map) << '\n';
+	std::cout << "my_map == my_map_2: " << (my_map == my_map_2) << '\n';
 	std::cout << std::endl;
 	std::cout << std::endl;
 
