@@ -1,23 +1,48 @@
-NAME = containers
 CC = clang++
 FLAGS = -g -Wall -Wextra -Werror -MMD -std=c++98
 DIR_OBJ = obj/
 DIR_D_FILE = dep/
 
-SRC =	main.cpp
+SRC_VECTOR =	test_vector.cpp
 
-OBJ = $(addprefix $(DIR_OBJ), $(SRC:.cpp=.o))
-D_FILES = $(addprefix $(DIR_D_FILE), $(SRC:.cpp=.d))
+OBJ_VECTOR = $(addprefix $(DIR_OBJ), $(SRC_VECTOR:.cpp=.o))
+D_FILES_VECTOR = $(addprefix $(DIR_D_FILE), $(SRC_VECTOR:.cpp=.d))
 
-all: $(NAME)
+SRC_MAP =	test_map.cpp
 
-$(NAME): $(OBJ)
+OBJ_MAP = $(addprefix $(DIR_OBJ), $(SRC_MAP:.cpp=.o))
+D_FILES_MAP = $(addprefix $(DIR_D_FILE), $(SRC_MAP:.cpp=.d))
+
+SRC_STACK =	test_stack.cpp
+
+OBJ_STACK = $(addprefix $(DIR_OBJ), $(SRC_STACK:.cpp=.o))
+D_FILES_STACK = $(addprefix $(DIR_D_FILE), $(SRC_STACK:.cpp=.d))
+
+all: vector map stack
+
+vector: $(OBJ_VECTOR)
 	@echo "\n"
-	@echo "\033[0;32mCompiling $(NAME)..."
-	@$(CC) $(OBJ) $(FLAGS) -o $(NAME)
+	@echo "\033[0;32mCompiling vector..."
+	@$(CC) $(OBJ_VECTOR) $(FLAGS) -o vector
 	@echo "\n\033[0mDone !"
 
--include $(D_FILES)
+-include $(D_FILES_VECTOR)
+
+map: $(OBJ_MAP)
+	@echo "\n"
+	@echo "\033[0;32mCompiling map..."
+	@$(CC) $(OBJ_MAP) $(FLAGS) -o map
+	@echo "\n\033[0mDone !"
+
+-include $(D_FILES_MAP)
+
+stack: $(OBJ_STACK)
+	@echo "\n"
+	@echo "\033[0;32mCompiling stack..."
+	@$(CC) $(OBJ_STACK) $(FLAGS) -o stack
+	@echo "\n\033[0mDone !"
+
+-include $(D_FILES_STACK)
 
 $(DIR_OBJ)%.o: %.cpp
 	@mkdir -p $(DIR_OBJ)
@@ -41,14 +66,13 @@ fclean:
 	@echo "\033[0;31m\nDeleting objects..."
 	@rm -rf $(DIR_OBJ)
 	@echo "\nDeleting executable..."
-	@rm -f $(NAME)
+	@rm -f vector
+	@rm -f map
+	@rm -f stack
 	@echo "\nDeleting trash..."
 	@rm -rf *_shrubbery
 	@echo "\033[0m"
 
 re: fclean all
 
-run: $(NAME)
-	@./$(NAME)
-
-.PHONY: clean fclean re run
+.PHONY: clean fclean re

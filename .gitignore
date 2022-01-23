@@ -4,3 +4,6 @@ CMakeLists.txt
 /.vscode
 *.d
 *.o
+vector
+map
+stack

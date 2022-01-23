@@ -145,9 +145,11 @@ int main()
 	std::cout << "size orig: " << orig_v.size() << std::endl;
 	std::vector<int>::iterator orig_it_begin = orig_v.begin();
 	std::vector<int>::iterator orig_it_end = orig_v.end();
+	(void)orig_it_begin;
 	orig_it_end--;
 	std::vector<int>::reverse_iterator rev_orig_it_begin = orig_v.rbegin();
 	std::vector<int>::reverse_iterator rev_orig_it_end = orig_v.rend();
+	(void)rev_orig_it_end;
 	rev_orig_it_begin++;
 	print_vec<std::vector<int>::iterator>(orig_v, "orig");
 	std::vector<int>::iterator orig_erase_it = orig_v.erase(orig_v.begin() + 1);
