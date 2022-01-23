@@ -4,6 +4,7 @@
 #include "iterator.hpp"
 #include "utils.hpp"
 #include "vector.hpp"
+#include <chrono>
 
 template <class Iter, class vect>
 	void print_vec(vect v, std::string msg)
@@ -16,6 +17,7 @@ template <class Iter, class vect>
 
 int main()
 {
+	auto start_my = std::chrono::system_clock::now();
 	ft::vector<int> my_v;
 	std::cout << "empty my: " << my_v.empty() << std::endl;
 	my_v.push_back(10);
@@ -130,8 +132,11 @@ int main()
 	std::cout << "operator<  : " << (copy_my_v < copy_my_v) << std::endl;
 	std::cout << "operator>  : " << (my_v > copy_my_v) << std::endl;
 	std::cout << "operator>  : " << (copy_my_v > copy_my_v) << std::endl;
+	auto end_my = std::chrono::system_clock::now();
 
 
+
+	auto start_orig = std::chrono::system_clock::now();
 	std::cout << std::endl;
 	std::vector<int> orig_v;
 	std::cout << "empty orig: " << orig_v.empty() << std::endl;
@@ -249,5 +254,9 @@ int main()
 	std::cout << "operator<  : " << (copy_orig_v < copy_orig_v) << std::endl;
 	std::cout << "operator>  : " << (orig_v > copy_orig_v) << std::endl;
 	std::cout << "operator>  : " << (copy_orig_v > copy_orig_v) << std::endl;
+	auto end_orig = std::chrono::system_clock::now();
+
+	std::cout << "ORIG Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_orig - start_orig).count() << std::endl;
+	std::cout << "MY Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_my - start_my).count() << std::endl;
 	return 0;
 }

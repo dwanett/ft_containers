@@ -1,5 +1,5 @@
 CC = clang++
-FLAGS = -g -Wall -Wextra -Werror -MMD -std=c++98
+FLAGS = -g -Wall -Wextra -Werror -MMD #-std=c++98
 DIR_OBJ = obj/
 DIR_D_FILE = dep/
 
